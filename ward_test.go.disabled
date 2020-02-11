@@ -1,0 +1,17 @@
+package tammany
+
+import (
+	. "launchpad.net/gocheck"
+)
+
+func (s *MySuite) TestWardAdjacency(c *C) {
+	c.Assert(g3, Not(IsNil))
+
+	for _, w1 := range g3.Wards {
+		for _, w2 := range g3.Wards {
+                        obtained := w1.adjacent(w2)
+			expected := adjacentWards[w1.ID].include(w2.ID)
+			c.Check(obtained, Equals, expected, Commentf("Expected the adjacency of wards %d and %d to be %v", w1.ID, w2.ID, expected))
+		}
+	}
+}

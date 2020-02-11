@@ -1,0 +1,134 @@
+package tammany
+
+import (
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+)
+
+func (g *Game) getPlayer(c *gin.Context) (*Player, error) {
+	pid, err := strconv.Atoi(c.PostForm("player"))
+	if err != nil {
+		return nil, err
+	}
+
+	return g.PlayerByID(pid), nil
+}
+
+//func (this *Game) PlaceImmigrantMenu() (tmpl template.HTML) {
+//	s := fmt.Sprintf(
+//		`       <div class="left-column">
+//                <div>
+//                        <div class="place-irish">
+//                                <div class="mybutton place-piece">
+//                                        <div class="text">
+//                                                Place
+//                                        </div>
+//                                        <div class="icon">
+//                                                <img alt="irish-cube" src=%q />
+//                                        </div>
+//                                </div>
+//                        </div>
+//                </div>
+//                <div>
+//                        <div class="place-english">
+//                                <div class="mybutton place-piece">
+//                                        <div class="text">
+//                                                Place
+//                                        </div>
+//                                        <div class="icon">
+//                                                <img alt="english-cube" src=%q />
+//                                        </div>
+//                                </div>
+//                        </div>
+//                </div>
+//        </div>
+//        <div class="right-column">
+//                <div>
+//                        <div class="place-german">
+//                                <div class="mybutton place-piece">
+//                                        <div class="text">
+//                                                Place
+//                                        </div>
+//                                        <div class="icon">
+//                                                <img alt="german-cube" src=%q />
+//                                        </div>
+//                                </div>
+//                        </div>
+//                </div>
+//                <div>
+//                        <div class="place-italian">
+//                                <div class="mybutton place-piece">
+//                                        <div class="text">
+//                                                Place
+//                                        </div>
+//                                        <div class="icon">
+//                                                <img alt="italian-cube" src=%q />
+//                                        </div>
+//                                </div>
+//                        </div>
+//                </div>
+//        </div>
+//`, Irish.CubeImage(), English.CubeImage(), German.CubeImage(), Italian.CubeImage())
+//	tmpl = template.HTML(s)
+//	return
+//}
+//
+//func (this *Game) TakeFavorMenu() (tmpl template.HTML) {
+//	s := fmt.Sprintf(
+//		`       <div class="left-column">
+//                <div>
+//                        <div class="take-irish-chip">
+//                                <div class="mybutton take-chip">
+//                                        <div class="text">
+//                                                Take
+//                                        </div>
+//                                        <div class="icon">
+//                                                <img alt="irish-cube" src=%q />
+//                                        </div>
+//                                </div>
+//                        </div>
+//                </div>
+//                <div>
+//                        <div class="take-english-chip">
+//                                <div class="mybutton take-chip">
+//                                        <div class="text">
+//                                                Take
+//                                        </div>
+//                                        <div class="icon">
+//                                                <img alt="english-cube" src=%q />
+//                                        </div>
+//                                </div>
+//                        </div>
+//                </div>
+//        </div>
+//        <div class="right-column">
+//                <div>
+//                        <div class="take-german-chip">
+//                                <div class="mybutton take-chip">
+//                                        <div class="text">
+//                                                Take
+//                                        </div>
+//                                        <div class="icon">
+//                                                <img alt="german-cube" src=%q />
+//                                        </div>
+//                                </div>
+//                        </div>
+//                </div>
+//                <div>
+//                        <div class="take-italian-chip">
+//                                <div class="mybutton take-chip">
+//                                        <div class="text">
+//                                                Take
+//                                        </div>
+//                                        <div class="icon">
+//                                                <img alt="italian-cube" src=%q />
+//                                        </div>
+//                                </div>
+//                        </div>
+//                </div>
+//        </div>
+//`, Irish.ChipImage(), English.ChipImage(), German.ChipImage(), Italian.ChipImage())
+//	tmpl = template.HTML(s)
+//	return
+//}

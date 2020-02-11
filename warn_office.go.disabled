@@ -1,0 +1,27 @@
+package tammany
+
+import (
+	"bitbucket.org/SlothNinja/slothninja-games/sn"
+	"bitbucket.org/SlothNinja/slothninja-games/sn/game"
+	"github.com/gin-gonic/gin"
+)
+
+func (g *Game) warnOffice(c *gin.Context) (string, game.ActionType, error) {
+	if err := g.validateWarnOffice(c); err != nil {
+		return "tammany/flash_notice", game.None, err
+	}
+
+	// Confirm
+	g.ConfirmedOffice = true
+	return "tammany/warn_office_dialog", game.Cache, nil
+}
+
+func (g *Game) validateWarnOffice(c *gin.Context) error {
+	switch {
+	case !g.CurrentUserIsCurrentPlayerOrAdmin():
+		return sn.NewVError("Only the current player can take this action.")
+	case !g.InActionPhase():
+		return sn.NewVError("Wrong phase for performing this action.")
+	}
+	return nil
+}

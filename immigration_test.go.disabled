@@ -1,0 +1,127 @@
+package tammany
+
+import (
+	. "launchpad.net/gocheck"
+)
+
+func (s *MySuite) TestImmigration(c *C) {
+	// Test 3 Players
+	for y := 1; y <= 9; y += 4 {
+		g1.SetYear(y)
+		g1.resetImmigrants()
+		for _, w := range g1.Zone1Wards() {
+			c.Check(w.Immigrants.Count(), Equals, 0)
+		}
+		for _, w := range g1.Zone2Wards() {
+			c.Check(w.Immigrants.Count(), Equals, 0)
+		}
+		for _, w := range g1.Zone3Wards() {
+			c.Check(w.Immigrants.Count(), Equals, 0)
+		}
+
+		g1.immigration()
+		for _, w := range g1.Zone1Wards() {
+			if y == 1 {
+				c.Check(w.Immigrants.Count(), Equals, 1)
+			} else {
+				c.Check(w.Immigrants.Count(), Equals, 0)
+			}
+		}
+		for _, w := range g1.Zone2Wards() {
+			if y == 5 {
+				c.Check(w.Immigrants.Count(), Equals, 1)
+			} else {
+				c.Check(w.Immigrants.Count(), Equals, 0)
+			}
+		}
+		for _, w := range g1.Zone3Wards() {
+			if y == 9 {
+				c.Check(w.Immigrants.Count(), Equals, 1)
+			} else {
+				c.Check(w.Immigrants.Count(), Equals, 0)
+			}
+		}
+	}
+
+	// Test 4 Players
+	for y := 1; y <= 9; y += 4 {
+		g2.SetYear(y)
+		g2.resetImmigrants()
+		for _, w := range g2.Zone1Wards() {
+			c.Check(w.Immigrants.Count(), Equals, 0)
+		}
+		for _, w := range g2.Zone2Wards() {
+			c.Check(w.Immigrants.Count(), Equals, 0)
+		}
+		for _, w := range g2.Zone3Wards() {
+			c.Check(w.Immigrants.Count(), Equals, 0)
+		}
+
+		g2.immigration()
+		for _, w := range g2.Zone1Wards() {
+			if y == 1 {
+				c.Check(w.Immigrants.Count(), Equals, 1)
+			} else {
+				c.Check(w.Immigrants.Count(), Equals, 0)
+			}
+		}
+		for _, w := range g2.Zone2Wards() {
+			if y == 1 {
+				c.Check(w.Immigrants.Count(), Equals, 1)
+			} else {
+				c.Check(w.Immigrants.Count(), Equals, 0)
+			}
+		}
+		for _, w := range g2.Zone3Wards() {
+			if y == 5 {
+				c.Check(w.Immigrants.Count(), Equals, 1)
+			} else {
+				c.Check(w.Immigrants.Count(), Equals, 0)
+			}
+		}
+	}
+
+	// Test 5 Players
+	for y := 1; y <= 9; y += 4 {
+		g3.SetYear(y)
+		g3.resetImmigrants()
+		for _, w := range g3.Zone1Wards() {
+			c.Check(w.Immigrants.Count(), Equals, 0)
+		}
+		for _, w := range g3.Zone2Wards() {
+			c.Check(w.Immigrants.Count(), Equals, 0)
+		}
+		for _, w := range g3.Zone3Wards() {
+			c.Check(w.Immigrants.Count(), Equals, 0)
+		}
+
+		g3.immigration()
+		for _, w := range g3.Zone1Wards() {
+			if y == 1 {
+				c.Check(w.Immigrants.Count(), Equals, 1)
+			} else {
+				c.Check(w.Immigrants.Count(), Equals, 0)
+			}
+		}
+		for _, w := range g3.Zone2Wards() {
+			if y == 1 {
+				c.Check(w.Immigrants.Count(), Equals, 1)
+			} else {
+				c.Check(w.Immigrants.Count(), Equals, 0)
+			}
+		}
+		for _, w := range g3.Zone3Wards() {
+			if y == 1 {
+				c.Check(w.Immigrants.Count(), Equals, 1)
+			} else {
+				c.Check(w.Immigrants.Count(), Equals, 0)
+			}
+		}
+	}
+}
+
+func (g *Game) resetImmigrants() {
+	for _, w := range g.Wards {
+		w.Immigrants = defaultNationals()
+	}
+}

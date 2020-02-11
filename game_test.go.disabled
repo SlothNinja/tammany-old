@@ -1,0 +1,170 @@
+package tammany
+
+import (
+	"net/http"
+	"net/url"
+	"testing"
+
+	"bitbucket.org/SlothNinja/gaelic-old"
+	. "launchpad.net/gocheck"
+
+	appenginetesting "github.com/tenntenn/gae-go-testing"
+)
+
+var ctx *appenginetesting.CTX
+var g1, g2, g3 *Game
+var u1, u2, u3, u4, u5 *sn.User
+var storedContests sn.Contests
+
+func getRequest() *http.Request {
+	r, _ := http.NewRequest("GET", "http://localhost", nil)
+	r.Header.Set("App-Testing", "1")
+	return r
+}
+
+// Hook up gocheck into the gotest runner.
+func Test(t *testing.T) { TestingT(t) }
+
+type MySuite struct{}
+
+var _ = Suite(&MySuite{})
+
+func (s *MySuite) SetUpSuite(c *C) {
+	createContext(c)
+}
+
+func (s *MySuite) SetUpTest(c *C) {
+	createTestUsers(c)
+	createTestGames(c)
+}
+
+func createContext(c *C) {
+	var err error
+	ctx, err = appenginetesting.NewContext(nil)
+	c.Assert(err, Equals, nil)
+}
+
+func createTestUsers(c *C) {
+	req := getRequest()
+	u1, u2, u3, u4, u5 = sn.NewUser(req), sn.NewUser(req), sn.NewUser(req), sn.NewUser(req), sn.NewUser(req)
+
+	//User1
+	db.SetNewKey(u1, 1)
+	u1.Name = "jeff"
+	u1.LCName = "jeff"
+	u1.Email = "jeff@example.com"
+	u1.GoogleID = "12345"
+
+	//User2
+	db.SetNewKey(u2, 2)
+	u2.Name = "joe"
+	u2.LCName = "joe"
+	u2.Email = "joe@example.com"
+	u2.GoogleID = "23456"
+
+	//User3
+	db.SetNewKey(u3, 3)
+	u3.Name = "trudy"
+	u3.LCName = "trudy"
+	u3.Email = "trudy@example.com"
+	u3.GoogleID = "23457"
+
+	//User4
+	db.SetNewKey(u4, 4)
+	u4.Name = "tyler"
+	u4.LCName = "tyler"
+	u4.Email = "tyler@example.com"
+	u4.GoogleID = "23458"
+
+	//User5
+	db.SetNewKey(u5, 5)
+	u5.Name = "george"
+	u5.LCName = "george"
+	u5.Email = "george@example.com"
+	u5.GoogleID = "13459"
+}
+
+func createTestGames(c *C) {
+	req := getRequest()
+
+	// Game 1
+	values1 := make(url.Values)
+	values1.Set("title", "Jeff's Game")
+	values1.Set("game-type", "1")
+	values1.Set("number_of_players", "3")
+
+	g1 = New(req)
+
+	c.Assert(u1, Not(IsNil))
+
+	err := g1.FromForm(u1, values1, "")
+	c.Assert(err, IsNil)
+
+	db.SetNewKey(g1, 1)
+	g1.UserIDS = db.IDS{1, 2, 3}
+	g1.Users = sn.Users{u1, u2, u3}
+
+	g1.afterCommon()
+
+	// Initial Game 1 setup
+	g1.FromHeader()
+	g1.afterCommon()
+
+	// Game 2
+	values2 := make(url.Values)
+	values2.Set("title", "SlothNinja's Game")
+	values2.Set("game-type", "2")
+	values2.Set("number_of_players", "4")
+
+	g2 = New(req)
+
+	c.Assert(u1, Not(IsNil))
+
+	err = g2.FromForm(u1, values2, "")
+	c.Assert(err, IsNil)
+
+	db.SetNewKey(g2, 2)
+	g2.UserIDS = db.IDS{1, 2, 3, 4}
+	g2.Users = sn.Users{u1, u2, u3, u4}
+
+	g2.afterCommon()
+
+	// Initial Game 2 setup
+	g2.FromHeader()
+	g2.afterCommon()
+
+	// Game 3
+	values3 := make(url.Values)
+	values3.Set("title", "SlothNinja's Game")
+	values3.Set("game-type", "2")
+	values3.Set("number_of_players", "5")
+
+	g3 = New(req)
+
+	c.Assert(u1, Not(IsNil))
+
+	err = g3.FromForm(u1, values3, "")
+	c.Assert(err, IsNil)
+
+	db.SetNewKey(g3, 3)
+	g3.UserIDS = db.IDS{1, 2, 3, 4, 5}
+	g3.Users = sn.Users{u1, u2, u3, u4, u5}
+
+	g3.afterCommon()
+
+	// Initial Game 3 setup
+	g3.FromHeader()
+	g3.afterCommon()
+}
+
+func (s *MySuite) TearDownSuite(c *C) {
+	ctx.Close()
+}
+
+func getTestGame(id db.ID) (*Game, error) {
+	req := getRequest()
+
+	g := New(req)
+	err := db.Get(g, id)
+	return g, err
+}

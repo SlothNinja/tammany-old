@@ -1,0 +1,46 @@
+package tammany
+
+import (
+	"bitbucket.org/SlothNinja/slothninja-games/sn/restful"
+	"bitbucket.org/SlothNinja/slothninja-games/sn/color"
+	"fmt"
+	"net/url"
+	"strconv"
+)
+
+func options(g *Game, values url.Values, v sn.View) error {
+	colors, err := g.validateOptions(values, v)
+	if err != nil {
+		return err
+	}
+
+	// Update Colors
+	p := g.CurrentPlayer()
+	p.SetColorMap(colors)
+	return nil
+}
+
+func (g *Game) validateOptions(values url.Values, v sn.View) (color.Colors, error) {
+        colors := make(color.Colors, len(g.Players()))
+	for _, p := range g.Players() {
+                c, err := strconv.Atoi(values.Get(fmt.Sprintf("index-%d", p.ID())))
+		if err != nil {
+			return nil, err
+		}
+		colors[p.ID()] = color.Color(c)
+	}
+
+	if !g.CurrentUserIsCurrentPlayerOrAdmin() {
+                return nil, sn.NewVError("Only the current player may update game options.")
+	}
+
+	for i := 0; i < g.NumPlayers-1; i++ {
+		for j := i + 1; j < g.NumPlayers; j++ {
+			if colors[i] == colors[j] {
+                                return nil, sn.NewVError("Each player must be assigned a different color.")
+			}
+		}
+	}
+
+	return colors, nil
+}

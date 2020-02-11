@@ -1,0 +1,71 @@
+package tammany
+
+import (
+	"bitbucket.org/SlothNinja/gaelic-old"
+	. "launchpad.net/gocheck"
+)
+
+func (s *MySuite) TestCompare(c *C) {
+	// No score, chips, or mayor
+	p1 := g1.Players()[0]
+	for _, p := range g1.Players()[1:] {
+		c.Check(p.compare(p1), Equals, sn.EqualTo)
+	}
+
+	// same score, but p1 has a chip and is greater than other players without chip
+	p1.Chips[Irish] = 1
+	for _, p := range g1.Players()[1:] {
+		c.Check(p1.compare(p), Equals, sn.GreaterThan)
+	}
+
+	p2 := g1.Players()[1]
+
+	// p2 has same number of chips but lesser nationality
+	p2.Chips[English] = 1
+	c.Check(p1.compare(p2), Equals, sn.GreaterThan)
+
+	// p2 has greater number of chips but lesser nationality
+	p2.Chips[German] = 1
+	c.Check(p1.compare(p2), Equals, sn.LessThan)
+
+	// p1 and p2 have same score and chips
+	p1.Chips = Chips{Irish: 2, English: 1, German: 3, Italian: 4}
+	p2.Chips = Chips{Irish: 2, English: 1, German: 3, Italian: 4}
+	c.Check(p1.compare(p2), Equals, sn.EqualTo)
+
+	// same score and chips but p1 is mayor
+	p1.Office = Mayor
+	c.Check(p1.compare(p2), Equals, sn.GreaterThan)
+
+	// p1 is mayor, but p2 has more chips
+	p2.Chips[German] += 1
+	c.Check(p1.compare(p2), Equals, sn.LessThan)
+
+	// p1 has greater score
+	p1.Score = 1
+	c.Check(p1.compare(p2), Equals, sn.GreaterThan)
+}
+
+func (s *MySuite) TestDeterminePlaces(c *C) {
+	p0 := g1.Players()[0]
+	p1 := g1.Players()[1]
+	p2 := g1.Players()[2]
+
+	p0.Score = 20
+	p1.Score = 18
+	p2.Score = 17
+
+	places := g1.determinePlaces()
+	c.Check(places, DeepEquals, []Players{{p0}, {p1}, {p2}})
+	c.Check(toIDS(places), DeepEquals, []db.IDS{{p0.User().ID()}, {p1.User().ID()}, {p2.User().ID()}})
+
+	p1.Score = 20
+	places = g1.determinePlaces()
+	c.Check(places, DeepEquals, []Players{{p0, p1}, {p2}})
+	c.Check(toIDS(places), DeepEquals, []db.IDS{{p0.User().ID(), p1.User().ID()}, {p2.User().ID()}})
+
+	p1.Office = Mayor
+	places = g1.determinePlaces()
+	c.Check(places, DeepEquals, []Players{{p1}, {p0}, {p2}})
+	c.Check(toIDS(places), DeepEquals, []db.IDS{{p1.User().ID()}, {p0.User().ID()}, {p2.User().ID()}})
+}
